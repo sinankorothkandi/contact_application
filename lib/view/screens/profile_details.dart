@@ -110,7 +110,7 @@ class ContactDetailsScreen extends StatelessWidget {
                             color: Color.fromARGB(134, 253, 244, 227),
                           ),
                           onPressed: () {
-                            // _openWhatsApp(contact['phone'].toString(), context);
+                            _openWhatsApp(contact['phone'].toString(), context);
                           }),
                     ),
                     const SizedBox(
@@ -205,29 +205,27 @@ class ContactDetailsScreen extends StatelessWidget {
     bool? res = await FlutterPhoneDirectCaller.callNumber(number);
     if (res == null || !res) {}
   }
-// void _openWhatsApp(String number, BuildContext context) async {
-//   String url = "https://wa.me/91$number";
-//   try {
-//     if (await canLaunchUrlString(url)) {
-//       await launchUrlString(url);
-//     } else {
-//       // Handle the case where WhatsApp is not installed or the URL cannot be launched
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text("WhatsApp is not installed or the URL cannot be launched"),
-//         ),
-//       );
-//     }
-//   } catch (e) {
-//     // Handle the PlatformException
-//     print('Error opening WhatsApp: $e');
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(
-//         content: Text("Error opening WhatsApp"),
-//       ),
-//     );
-//   }
-// }
+void _openWhatsApp(String number, BuildContext context) async {
+  String url = "https://wa.me/91$number";
+  try {
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("WhatsApp is not installed or the URL cannot be launched"),
+        ),
+      );
+    }
+  } catch (e) {
+    print('Error opening WhatsApp: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Error opening WhatsApp"),
+      ),
+    );
+  }
+}
   void showDeleteAlert(BuildContext context, Id) {
     showDialog(
         context: context,

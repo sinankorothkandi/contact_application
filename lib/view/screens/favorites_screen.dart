@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contact_app/view/screens/contact_form.dart';
 import 'package:contact_app/view/screens/profile_details.dart';
 import 'package:contact_app/view/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +75,6 @@ class _FavoritesViewState extends State<FavoritesView> {
                   }).toList();
 
                   if (favoriteContacts.isEmpty) {
-                    // Display message if no favorite contacts
                     return const Center(
                       child: Text(
                         'There No Favorite Contacts',

@@ -34,19 +34,17 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
   void _saveContact() async {
     if (_formKey.currentState!.validate()) {
       final contact = Contact(
-        id: widget.contact?['id'], // Access the id from the Map
+        id: widget.contact?['id'], 
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
         email: _emailController.text.trim(),
         isFavorite: isFavorite,
-        image: '', // No image, but keeping for model consistency
+        image: '', 
       );
 
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      // Check if it's a new contact or an existing one
       if (widget.contact == null || widget.contact!['id'] == null) {
-        // Add new contact to Firestore
         var idd = DateTime.now().microsecondsSinceEpoch.toInt();
         await firestore.collection('contacts').doc(idd.toString()).set({
           'id': idd,
@@ -56,7 +54,6 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
           'isFavorite': contact.isFavorite,
         });
       } else {
-        // Update existing contact in Firestore
         await firestore
             .collection('contacts')
             .doc(widget.contact!['id'].toString())

@@ -156,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final name = contactData['name'] ?? '';
       if (name.isEmpty) continue;
 
-      // Convert the first letter to uppercase for consistent grouping
       final firstLetter = name[0].toUpperCase();
       groupedContacts.putIfAbsent(firstLetter, () => []).add(doc);
     }
