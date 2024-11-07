@@ -17,86 +17,94 @@ class FavoritesView extends StatefulWidget {
 class _FavoritesViewState extends State<FavoritesView> {
   String _searchQuery = '';
 
-  void _handleSearchQueryChanged(String query) {
+  void handleSearchQueryChanged(String query) {
     setState(() {
       _searchQuery = query;
     });
   }
 
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 40),
-          SearchBarWidget(
-            onSearchQueryChanged: _handleSearchQueryChanged,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.78,
-            width: double.infinity,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('contacts')
-                  .where('name', isGreaterThanOrEqualTo: _searchQuery)
-                  .where('name', isLessThanOrEqualTo: '$_searchQuery\uf8ff')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return ListView.builder(
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return const ShimmerListTile();
-                    },
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  String errorMessage = 'Error: ${snapshot.error}';
-                  if (snapshot.error
-                      .toString()
-                      .contains('FAILED_PRECONDITION')) {
-                    errorMessage =
-                        'The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/contact--application/firestore/indexes?create_composite=ClVwcm9qZWN0cy9jb250YWN0LS1hcHBsaWNhdGlvbi9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvY29udGFjdHMvaW5kZXhlcy9fEAEaDgoKaXNGYXZvcml0ZRABGggKBG5hbWUQARoMCghfX25hbWVfXxAB';
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            search_fuction(handleSearchQueryChanged, searchController),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('contacts')
+                    .where('name', isGreaterThanOrEqualTo: _searchQuery)
+                    .where('name', isLessThanOrEqualTo: '$_searchQuery\uf8ff')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ListView.builder(
+                      itemCount: 15,
+                      itemBuilder: (context, index) {
+                        return const ShimmerListTile();
+                      },
+                    );
                   }
-                  return Center(child: Text(errorMessage));
-                }
 
-                final contactDocs = snapshot.data?.docs ?? [];
-                final favoriteContacts = contactDocs.where((doc) {
-                  final contactData = doc.data() as Map<String, dynamic>;
-                  return contactData['isFavorite'] == true;
-                }).toList();
+                  if (snapshot.hasError) {
+                    String errorMessage = 'Error: ${snapshot.error}';
+                    if (snapshot.error
+                        .toString()
+                        .contains('FAILED_PRECONDITION')) {
+                      errorMessage =
+                          'The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/contact--application/firestore/indexes?create_composite=ClVwcm9qZWN0cy9jb250YWN0LS1hcHBsaWNhdGlvbi9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvY29udGFjdHMvaW5kZXhlcy9fEAEaDgoKaXNGYXZvcml0ZRABGggKBG5hbWUQARoMCghfX25hbWVfXxAB';
+                    }
+                    return Center(child: Text(errorMessage));
+                  }
 
-                if (favoriteContacts.isEmpty) {
-                  // Display message if no favorite contacts
-                  return const Center(
-                    child: Text(
-                      'There No Favorite Contacts',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                  final contactDocs = snapshot.data?.docs ?? [];
+                  final favoriteContacts = contactDocs.where((doc) {
+                    final contactData = doc.data() as Map<String, dynamic>;
+                    return contactData['isFavorite'] == true;
+                  }).toList();
+
+                  if (favoriteContacts.isEmpty) {
+                    // Display message if no favorite contacts
+                    return const Center(
+                      child: Text(
+                        'There No Favorite Contacts',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 15),
+                    child: ListView.builder(
+                      itemCount: favoriteContacts.length,
+                      itemBuilder: (context, index) {
+                        final doc = favoriteContacts[index];
+                        final contactData = doc.data() as Map<String, dynamic>;
+                        return ContactListTile(
+                          contactData: contactData,
+                          heroTag: 'contact_$index',
+                        );
+                      },
                     ),
                   );
-                }
-
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  child: ListView.builder(
-                    itemCount: favoriteContacts.length,
-                    itemBuilder: (context, index) {
-                      final doc = favoriteContacts[index];
-                      final contactData = doc.data() as Map<String, dynamic>;
-                      return ContactListTile(
-                        contactData: contactData,
-                        heroTag: 'contact_$index',
-                      );
-                    },
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -160,7 +168,6 @@ class ContactListTile extends StatelessWidget {
         contactData['name'],
         style: GoogleFonts.poppins(),
       ),
-      trailing: const Icon(Icons.navigate_next),
       onTap: () {
         Navigator.push(
           context,

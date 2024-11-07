@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contact_app/model/contact_model.dart';
-import 'package:contact_app/view/screens/favorites_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ContactFormScreen extends StatefulWidget {
   final Map<String, dynamic>? contact;
@@ -100,132 +100,138 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 50),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 70),
-              GestureDetector(
-                onTap: () {
-                  // ctrl.pickImage();
-                },
-                child: const CircleAvatar(
-                    backgroundColor: Color.fromARGB(90, 216, 188, 94),
-                    radius: 70,
-                    // backgroundImage: ctrl.imageFile.value != null
-                    //     ? FileImage(ctrl.imageFile.value!)
-                    //     : null,
-                    child: Icon(
-                      Icons.add_photo_alternate_rounded,
-                      size: 50,
-                      color: Color.fromARGB(134, 253, 244, 227),
-                    )),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Add Image',
-                style: TextStyle(color: Color.fromARGB(255, 197, 161, 2)),
-              ),
-              const SizedBox(height: 50),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[600]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        width: 2, color: Color.fromARGB(255, 197, 161, 2)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 70),
+                GestureDetector(
+                  onTap: () {
+                    // ctrl.pickImage();
+                  },
+                  child: const CircleAvatar(
+                      backgroundColor: Color.fromARGB(90, 216, 188, 94),
+                      radius: 70,
+                      // backgroundImage: ctrl.imageFile.value != null
+                      //     ? FileImage(ctrl.imageFile.value!)
+                      //     : null,
+                      child: Icon(
+                        Icons.add_photo_alternate_rounded,
+                        size: 50,
+                        color: Color.fromARGB(134, 253, 244, 227),
+                      )),
                 ),
-                style: const TextStyle(color: Colors.white),
-                validator: (value) => value!.isEmpty ? 'Enter name' : null,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Phone',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[600]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        width: 2, color: Color.fromARGB(255, 197, 161, 2)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Add Image',
+                  style: TextStyle(color: Color.fromARGB(255, 197, 161, 2)),
                 ),
-                style: const TextStyle(color: Colors.white),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter phone number';
-                  }
-                  if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-                    return 'Enter a valid 10-digit phone number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[600]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                        width: 2, color: Color.fromARGB(255, 197, 161, 2)),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                style: const TextStyle(color: Colors.white),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter email';
-                  }
-                  if (!RegExp(r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,4}$')
-                      .hasMatch(value)) {
-                    return 'Enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveContact,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 197, 161, 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
+                const SizedBox(height: 50),
+                TextFormField(
+                  controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]')),
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[600]!),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          width: 2, color: Color.fromARGB(255, 197, 161, 2)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: Text(
-                    widget.contact == null ? 'Save' : 'Update Contact',
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  style: const TextStyle(color: Colors.white),
+                  validator: (value) => value!.isEmpty ? 'Enter name' : null,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: 'Phone',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[600]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          width: 2, color: Color.fromARGB(255, 197, 161, 2)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter phone number';
+                    }
+                    if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                      return 'Enter a valid 10-digit phone number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[600]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          width: 2, color: Color.fromARGB(255, 197, 161, 2)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter email';
+                    }
+                    if (!RegExp(r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,4}$')
+                        .hasMatch(value)) {
+                      return 'Enter a valid email address';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saveContact,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 197, 161, 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(27),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    child: Text(
+                      widget.contact == null ? 'Save' : 'Update Contact',
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contact_app/navbar.dart';
 import 'package:contact_app/view/screens/contact_form.dart';
-import 'package:contact_app/view/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ContactDetailsScreen extends StatelessWidget {
   final contact;
@@ -103,12 +104,14 @@ class ContactDetailsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(90, 216, 188, 94),
                           borderRadius: BorderRadius.circular(90)),
-                      child: const IconButton(
+                      child: IconButton(
                           icon: Icon(
                             Icons.message_outlined,
                             color: Color.fromARGB(134, 253, 244, 227),
                           ),
-                          onPressed: null),
+                          onPressed: () {
+                            // _openWhatsApp(contact['phone'].toString(), context);
+                          }),
                     ),
                     const SizedBox(
                       height: 5,
@@ -202,7 +205,29 @@ class ContactDetailsScreen extends StatelessWidget {
     bool? res = await FlutterPhoneDirectCaller.callNumber(number);
     if (res == null || !res) {}
   }
-
+// void _openWhatsApp(String number, BuildContext context) async {
+//   String url = "https://wa.me/91$number";
+//   try {
+//     if (await canLaunchUrlString(url)) {
+//       await launchUrlString(url);
+//     } else {
+//       // Handle the case where WhatsApp is not installed or the URL cannot be launched
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text("WhatsApp is not installed or the URL cannot be launched"),
+//         ),
+//       );
+//     }
+//   } catch (e) {
+//     // Handle the PlatformException
+//     print('Error opening WhatsApp: $e');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(
+//         content: Text("Error opening WhatsApp"),
+//       ),
+//     );
+//   }
+// }
   void showDeleteAlert(BuildContext context, Id) {
     showDialog(
         context: context,
